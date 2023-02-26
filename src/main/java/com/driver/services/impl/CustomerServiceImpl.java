@@ -153,20 +153,20 @@ public class CustomerServiceImpl implements CustomerService {
 		tripBooking.setBill(0);
 
 		//between Customer and TripBooking
-		Customer customer = tripBooking.getCustomer();
-		List<TripBooking> tripsBookedByCustomer = customer.getListOfTripsBooked();
-		tripsBookedByCustomer.remove(tripBooking);
-		customer.setListOfTripsBooked(tripsBookedByCustomer);
-
+//		Customer customer = tripBooking.getCustomer();
+//		List<TripBooking> tripsBookedByCustomer = customer.getListOfTripsBooked();
+//		tripsBookedByCustomer.remove(tripBooking);
+//		customer.setListOfTripsBooked(tripsBookedByCustomer);
+//
 		//between Driver and TripBooking
-		Driver driver = tripBooking.getDriver();
-		List<TripBooking> tripsBookedByDriver = driver.getTripsTakenByDriver();
-		tripsBookedByDriver.remove(tripBooking);
-		driver.setTripsTakenByDriver(tripsBookedByDriver);
-		driver.getCab().setAvailable(true); //cab will also be available now
+//		Driver driver = tripBooking.getDriver();
+//		List<TripBooking> tripsBookedByDriver = driver.getTripsTakenByDriver();
+//		tripsBookedByDriver.remove(tripBooking);
+//		driver.setTripsTakenByDriver(tripsBookedByDriver);
+//		driver.getCab().setAvailable(true); //cab will also be available now
 
-		driverRepository2.save(driver);
-		customerRepository2.save(customer);//save parent
+		tripBooking.getDriver().getCab().setAvailable(true);
+		tripBookingRepository2.save(tripBooking);
 	}
 
 	@Override

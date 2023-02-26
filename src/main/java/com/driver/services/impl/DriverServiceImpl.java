@@ -60,6 +60,6 @@ public class DriverServiceImpl implements DriverService {
 		//Set the status of respective car to unavailable
 		Driver driver = driverRepository3.findById(driverId).get();
 		driver.getCab().setAvailable(false);
-		cabRepository3.save(driver.getCab());//saved parent
+		driverRepository3.save(driver);//saved parent //But save driver no need to save cab
 	}
 }
