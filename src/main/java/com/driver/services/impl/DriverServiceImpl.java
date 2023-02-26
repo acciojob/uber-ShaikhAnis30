@@ -34,7 +34,7 @@ public class DriverServiceImpl implements DriverService {
 		cab.setAvailable(true);
 		driver.setCab(cab);
 
-//		cabRepository3.save(cab);//saved parent
+//		cabRepository3.save(cab);//saved parent --> Never save parent, question is asking for driver
 		driverRepository3.save(driver);
 	}
 
