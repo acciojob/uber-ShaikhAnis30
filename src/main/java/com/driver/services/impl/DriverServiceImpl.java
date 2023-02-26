@@ -34,7 +34,8 @@ public class DriverServiceImpl implements DriverService {
 		cab.setAvailable(true);
 		driver.setCab(cab);
 
-		cabRepository3.save(cab);//saved parent
+//		cabRepository3.save(cab);//saved parent
+		driverRepository3.save(driver);
 	}
 
 	@Override
@@ -50,7 +51,7 @@ public class DriverServiceImpl implements DriverService {
 		}
 		//also delete the cab associated with this driver
 		Cab cab = driver.getCab();
-		cabRepository3.delete(cab);
+		cabRepository3.delete(cab); //Cab is parent of Driver
 
 		driverRepository3.delete(driver); //by cascading effect tripsTakenByThisDriver will also be deleted
 	}
