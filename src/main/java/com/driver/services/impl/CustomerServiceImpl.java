@@ -90,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
 				break;
 			}
 		}
-
+//
 		if(!flag) throw new Exception("No cab available!");
 		customerRepository2.save(customer);
 		return tripBooking;
@@ -106,7 +106,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public void cancelTrip(Integer tripId){
+	public void cancelTrip(Integer tripId) {
 		//Cancel the trip having given trip Id and update TripBooking attributes accordingly
 		TripBooking tripBooking = tripBookingRepository2.findById(tripId).get();
 		//setting attributes
@@ -126,6 +126,7 @@ public class CustomerServiceImpl implements CustomerService {
 		driver.setTripsTakenByDriver(tripsBookedByDriver);
 		driver.getCab().setAvailable(true); //cab will also be available now
 
+		driverRepository2.save(driver);
 		customerRepository2.save(customer);//save parent
 	}
 
@@ -135,10 +136,10 @@ public class CustomerServiceImpl implements CustomerService {
 		TripBooking tripBooking = tripBookingRepository2.findById(tripId).get();
 		//setting attributes
 		tripBooking.setStatus(TripStatus.COMPLETED);
-//		tripBooking.setBill(0);
+		//tripBooking.setBill(0);
 		Driver driver = tripBooking.getDriver();
 		tripBooking.setBill(driver.getCab().getPerKmRate() * tripBooking.getDistanceInKm());
 		driver.getCab().setAvailable(true);//journey completed, so cab is available for upcoming customer
-		driverRepository2.save(driver);
+		driverRepository2.save(driver);//saved parent
 	}
 }
