@@ -38,6 +38,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public void deleteCustomer(Integer customerId) {
 		// Delete customer without using deleteById function
 		Customer customer = customerRepository2.findById(customerId).get();
+		//customer confirmed should trips also be canceled
 		List<TripBooking> tripBookingList = customer.getListOfTripsBooked();
 		for (TripBooking tripBooking : tripBookingList) {
 			if(tripBooking.getStatus().equals(TripStatus.CONFIRMED)) {
@@ -52,57 +53,88 @@ public class CustomerServiceImpl implements CustomerService {
 		//Book the driver with lowest driverId who is free (cab available variable is Boolean.TRUE). If no driver is available, throw "No cab available!" exception
 		//Avoid using SQL query
 		List<Driver> allDrivers =  driverRepository2.findAll();
-		TreeSet<Integer> driversById = new TreeSet<>();
-		for (Driver driver : allDrivers) {
-			int id = driver.getDriverId();
-			driversById.add(id);
-		}
-		Customer customer = customerRepository2.findById(customerId).get();
-		TripBooking tripBooking = new TripBooking();
-		boolean flag = false;
-		for (int id : driversById) {
-			Driver driver = driverRepository2.findById(id).get();
-			if(driver.getCab().getAvailable()) {
-				flag = true;
-
-				//setting attributes
-				tripBooking.setFromLocation(fromLocation);
-				tripBooking.setToLocation(toLocation);
-				tripBooking.setDistanceInKm(distanceInKm);
-				tripBooking.setStatus(TripStatus.CONFIRMED);
-				tripBooking.setBill(distanceInKm * driver.getCab().getPerKmRate());  //1Km - 10rs
-				//now foreign key attribute
-				tripBooking.setCustomer(customer);
-				tripBooking.setDriver(driver);
-
-				//between driver and TripBooking
-				List<TripBooking> tripsByDriver = driver.getTripsTakenByDriver();
-				tripsByDriver.add(tripBooking);
-				driver.setTripsTakenByDriver(tripsByDriver);
-				driver.getCab().setAvailable(false); //no need I think
-
-				//between customer and TripBooking
-				List<TripBooking> tripsByCustomer = customer.getListOfTripsBooked();
-				tripsByCustomer.add(tripBooking);
-				customer.setListOfTripsBooked(tripsByCustomer);
-
-				driverRepository2.save(driver);
-				break;
-			}
-		}
+//		TreeSet<Integer> driversById = new TreeSet<>();
+//		for (Driver driver : allDrivers) {
+//			int id = driver.getDriverId();
+//			driversById.add(id);
+//		}
+//		Customer customer = customerRepository2.findById(customerId).get();
+//		TripBooking tripBooking = new TripBooking();
+//		boolean flag = false;
+//		for (int id : driversById) {
+//			Driver driver = driverRepository2.findById(id).get();
+//			if(driver.getCab().getAvailable()) {
+//				flag = true;
 //
-		if(!flag) throw new Exception("No cab available!");
-		customerRepository2.save(customer);
-		return tripBooking;
-
-//		List<Driver> listOfDrivers = driverRepository2.findAll();
-//		Driver driver = null;
-//		for (Driver driver1 : listOfDrivers) {
-//			if(driver1.getCab().getAvailable()) {
-//				if(driver1 != null && driver1.getDriverId() > driver.getDriverId())
-//					driver = driver1;
+//				//setting attributes
+//				tripBooking.setFromLocation(fromLocation);
+//				tripBooking.setToLocation(toLocation);
+//				tripBooking.setDistanceInKm(distanceInKm);
+//				tripBooking.setStatus(TripStatus.CONFIRMED);
+//				tripBooking.setBill(distanceInKm * driver.getCab().getPerKmRate());  //1Km - 10rs
+//				//now foreign key attribute
+//				tripBooking.setCustomer(customer);
+//				tripBooking.setDriver(driver);
+//
+//				//between driver and TripBooking
+//				List<TripBooking> tripsByDriver = driver.getTripsTakenByDriver();
+//				tripsByDriver.add(tripBooking);
+//				driver.setTripsTakenByDriver(tripsByDriver);
+//				driver.getCab().setAvailable(false); //no need I think
+//
+//				//between customer and TripBooking
+//				List<TripBooking> tripsByCustomer = customer.getListOfTripsBooked();
+//				tripsByCustomer.add(tripBooking);
+//				customer.setListOfTripsBooked(tripsByCustomer);
+//
+//				driverRepository2.save(driver);
+//				break;
 //			}
 //		}
+//
+//		if(!flag) throw new Exception("No cab available!");
+//		customerRepository2.save(customer);
+//		return tripBooking;
+
+		List<Driver> listOfDrivers = driverRepository2.findAll();
+		Driver driver = new Driver(); //dummy driver
+		driver.setDriverId(Integer.MIN_VALUE);
+		for (Driver driver1 : listOfDrivers) {
+			if(driver1.getCab().getAvailable()) {
+				if(driver1.getDriverId() > driver.getDriverId())
+					driver = driver1;
+			}
+		}
+		//now I got the driver with min id
+		if(driver.getDriverId() == Integer.MIN_VALUE) throw new Exception("No cab available!");
+
+		//now I have to book the cab
+		Customer customer = customerRepository2.findById(customerId).get();
+		TripBooking tripBooking = new TripBooking();
+		//setting attributes
+		tripBooking.setFromLocation(fromLocation);
+		tripBooking.setToLocation(toLocation);
+		tripBooking.setDistanceInKm(distanceInKm);
+		tripBooking.setStatus(TripStatus.CONFIRMED);
+		tripBooking.setBill(distanceInKm * driver.getCab().getPerKmRate());  //1Km - 10rs
+		//now foreign key attribute
+		tripBooking.setCustomer(customer);
+		tripBooking.setDriver(driver);
+
+		//between driver and TripBooking
+		List<TripBooking> tripsByDriver = driver.getTripsTakenByDriver();
+		tripsByDriver.add(tripBooking);
+		driver.setTripsTakenByDriver(tripsByDriver);
+		driver.getCab().setAvailable(false);
+		driverRepository2.save(driver);//saved driver individually
+
+		//between customer and TripBooking
+		List<TripBooking> tripsByCustomer = customer.getListOfTripsBooked();
+		tripsByCustomer.add(tripBooking);
+		customer.setListOfTripsBooked(tripsByCustomer);
+		customerRepository2.save(customer); //saved parent --> tripBooking will be saved automatically
+
+		return tripBooking;
 	}
 
 	@Override
@@ -131,7 +163,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public void completeTrip(Integer tripId){
+	public void completeTrip(Integer tripId) {
 		//Complete the trip having given trip Id and update TripBooking attributes accordingly
 		TripBooking tripBooking = tripBookingRepository2.findById(tripId).get();
 		//setting attributes
