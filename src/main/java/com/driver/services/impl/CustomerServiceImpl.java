@@ -113,7 +113,7 @@ public class CustomerServiceImpl implements CustomerService {
 			}
 		}
 		//now I got the driver with min id
-		if(driver.getDriverId() == Integer.MIN_VALUE) throw new Exception("No cab available!");
+		if(driver.getDriverId() == Integer.MAX_VALUE) throw new Exception("No cab available!");
 
 		//now I have to book the cab
 		Customer customer = customerRepository2.findById(customerId).get();
