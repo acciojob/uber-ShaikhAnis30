@@ -43,15 +43,15 @@ public class DriverServiceImpl implements DriverService {
 		// Delete driver without using deleteById function
 		Driver driver = driverRepository3.findById(driverId).get();
 		//all the trips and cab of this driver should be canceled
-		List<TripBooking> allTripsOfThisDriver = driver.getTripsTakenByDriver();
-		for (TripBooking trip : allTripsOfThisDriver) {
-			if(trip.getStatus().equals(TripStatus.CONFIRMED)) {
-				trip.setStatus(TripStatus.CANCELED); //cancelled all the confirmed trips of this driver
-			}
-		}
-		//also delete the cab associated with this driver
-		Cab cab = driver.getCab();
-		cabRepository3.delete(cab); //Cab is parent of Driver
+//		List<TripBooking> allTripsOfThisDriver = driver.getTripsTakenByDriver();
+//		for (TripBooking trip : allTripsOfThisDriver) {
+//			if(trip.getStatus().equals(TripStatus.CONFIRMED)) {
+//				trip.setStatus(TripStatus.CANCELED); //cancelled all the confirmed trips of this driver
+//			}
+//		}
+//		//also delete the cab associated with this driver
+//		Cab cab = driver.getCab();
+//		cabRepository3.delete(cab); //Cab is parent of Driver
 
 		driverRepository3.delete(driver); //by cascading effect tripsTakenByThisDriver will also be deleted
 	}

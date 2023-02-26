@@ -39,12 +39,12 @@ public class CustomerServiceImpl implements CustomerService {
 		// Delete customer without using deleteById function
 		Customer customer = customerRepository2.findById(customerId).get();
 		//customer confirmed should trips also be canceled
-		List<TripBooking> tripBookingList = customer.getListOfTripsBooked();
-		for (TripBooking tripBooking : tripBookingList) {
-			if(tripBooking.getStatus().equals(TripStatus.CONFIRMED)) {
-				tripBooking.setStatus(TripStatus.CANCELED);
-			}
-		}
+//		List<TripBooking> tripBookingList = customer.getListOfTripsBooked();
+//		for (TripBooking tripBooking : tripBookingList) {
+//			if(tripBooking.getStatus().equals(TripStatus.CONFIRMED)) {
+//				tripBooking.setStatus(TripStatus.CANCELED);
+//			}
+//		}
 		customerRepository2.delete(customer);
 	}
 
@@ -147,18 +147,19 @@ public class CustomerServiceImpl implements CustomerService {
 		tripBooking.setStatus(TripStatus.CANCELED);
 		tripBooking.setBill(0);
 
+		//No need to remove coz we have to record CANCELED transaction also
 		//between Customer and TripBooking
-		Customer customer = tripBooking.getCustomer();
-		List<TripBooking> tripsBookedByCustomer = customer.getListOfTripsBooked();
-		tripsBookedByCustomer.remove(tripBooking);
-		customer.setListOfTripsBooked(tripsBookedByCustomer);
-
+//		Customer customer = tripBooking.getCustomer();
+//		List<TripBooking> tripsBookedByCustomer = customer.getListOfTripsBooked();
+//		tripsBookedByCustomer.remove(tripBooking);
+//		customer.setListOfTripsBooked(tripsBookedByCustomer);
+//
 //		between Driver and TripBooking
-		Driver driver = tripBooking.getDriver();
-		List<TripBooking> tripsBookedByDriver = driver.getTripsTakenByDriver();
-		tripsBookedByDriver.remove(tripBooking);
-		driver.setTripsTakenByDriver(tripsBookedByDriver);
-		driver.getCab().setAvailable(true); //cab will also be available now
+//		Driver driver = tripBooking.getDriver();
+//		List<TripBooking> tripsBookedByDriver = driver.getTripsTakenByDriver();
+//		tripsBookedByDriver.remove(tripBooking);
+//		driver.setTripsTakenByDriver(tripsBookedByDriver);
+//		driver.getCab().setAvailable(true); //cab will also be available now
 
 //		tripBooking.getDriver().getCab().setAvailable(true);
 		tripBookingRepository2.save(tripBooking);
