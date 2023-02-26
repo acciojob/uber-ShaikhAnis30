@@ -98,11 +98,18 @@ public class CustomerServiceImpl implements CustomerService {
 
 		List<Driver> listOfDrivers = driverRepository2.findAll();
 		Driver driver = new Driver(); //dummy driver
-		driver.setDriverId(Integer.MIN_VALUE);
+		driver.setDriverId(Integer.MAX_VALUE);
 		for (Driver driver1 : listOfDrivers) {
 			if(driver1.getCab().getAvailable()) {
-				if(driver1.getDriverId() > driver.getDriverId())
+				if(driver1.getDriverId() < driver.getDriverId()) {
 					driver = driver1;
+					//set attributes also
+//					driver.setDriverId(driver1.getDriverId());
+//					driver.setMobile(driver1.getMobile());
+//					driver.setPassword(driver1.getPassword());
+//					driver.setCab(driver1.getCab());
+//					driver.setTripsTakenByDriver(driver1.getTripsTakenByDriver());
+				}
 			}
 		}
 		//now I got the driver with min id
