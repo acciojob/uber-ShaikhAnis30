@@ -18,8 +18,7 @@ public class Driver {
 
     //Driver to Cab(OneToOne)
     //Parent(Driver)
-    @OneToOne
-    @JoinColumn
+    @OneToOne(mappedBy = "driver", cascade =  CascadeType.ALL)
     private Cab cab;
 
 
